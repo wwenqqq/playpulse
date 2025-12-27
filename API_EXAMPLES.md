@@ -23,9 +23,9 @@ http://localhost:8080
 **通用响应格式:**
 ```json
 {
-  "code": 200,           // 状态码：200成功，500失败
-  "message": "success",  // 提示信息
-  "data": {}            // 返回数据
+  "code": 200,          
+  "message": "success",  
+  "data": {}           
 }
 ```
 
@@ -48,8 +48,8 @@ Header: Authorization: Bearer {token}
 **请求参数:**
 ```json
 {
-  "username": "testuser",    // 必填，3-50字符
-  "password": "123456"       // 必填，6-20字符
+  "username": "testuser",    
+  "password": "123456"       
 }
 ```
 
@@ -227,9 +227,9 @@ curl -X GET http://localhost:8080/api/auth/info \
 **请求参数:**
 ```json
 {
-  "title": "完成项目报告",          // 必填，最长200字符
-  "description": "需要在本周五前完成",  // 可选
-  "deadline": "2025-12-31T23:59:59"  // 可选，ISO格式
+  "title": "完成项目报告",          
+  "description": "需要在本周五前完成", 
+  "deadline": "2025-12-31T23:59:59"  
 }
 ```
 
@@ -435,7 +435,7 @@ curl -X GET http://localhost:8080/api/tasks/1 \
 {
   "title": "完成项目报告（已修改）",
   "description": "需要在本周五前完成并提交",
-  "status": "DOING",                    // TODO/DOING/DONE
+  "status": "DOING",                  
   "deadline": "2026-01-15T12:00:00"
 }
 ```
