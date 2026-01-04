@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务管理 - 任务管理系统</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="container-wide">
+    <!-- 顶部导航 -->
+    <div class="header">
+        <h2>📋 任务管理</h2>
+        <div class="user-info">
+            <span id="username"></span>
+            <button class="btn btn-small" onclick="logout()">退出</button>
+        </div>
+    </div>
+
+    <!-- 创建任务表单 -->
+    <div class="task-form-card">
+        <h3>✏️ 创建新任务</h3>
+        <div class="form-row">
+            <div class="form-group">
+                <label>任务标题 *</label>
+                <input type="text" id="taskTitle" placeholder="请输入任务标题" maxlength="200">
+            </div>
+            <div class="form-group">
+                <label>截止时间</label>
+                <input type="datetime-local" id="taskDeadline">
+            </div>
+        </div>
+        <div class="form-group">
+            <label>任务描述</label>
+            <textarea id="taskDescription" rows="3" placeholder="请输入任务描述（可选）"></textarea>
+        </div>
+        <button class="btn btn-primary" onclick="createTask()">创建任务</button>
+        <div id="createMessage" class="message"></div>
+    </div>
+
+    <!-- 排序和筛选 -->
+    <div class="filter-bar">
+        <div class="filter-group">
+            <label>排序方式：</label>
+            <select id="sortBy" onchange="loadTasks()">
+                <option value="createdAt">按创建时间</option>
+                <option value="deadline">按截止时间</option>
+            </select>
+        </div>
+        <button class="btn btn-secondary" onclick="loadTasks()">🔄 刷新</button>
+    </div>
+
+    <!-- 任务列表 -->
+    <div class="tasks-container">
+        <h3>📝 我的任务</h3>
+        <div id="tasksList"></div>
+    </div>
+
+    <!-- 编辑任务模态框 -->
+    <div id="editModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" onclick="closeEditModal()">&times;</span>
+            <h3>✏️ 编辑任务</h3>
+            <input type="hidden" id="editTaskId">
+            <div class="form-group">
+                <label>任务标题</label>
+                <input type="text" id="editTaskTitle" maxlength="200">
+            </div>
+            <div class="form-group">
+                <label>任务描述</label>
+                <textarea id="editTaskDescription" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label>状态</label>
+                <select id="editTaskStatus">
+                    <option value="TODO">待办</option>
+                    <option value="DOING">进行中</option>
+                    <option value="DONE">已完成</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>截止时间</label>
+                <input type="datetime-local" id="editTaskDeadline">
+            </div>
+            <button class="btn btn-primary" onclick="updateTask()">保存修改</button>
+            <button class="btn btn-secondary" onclick="closeEditModal()">取消</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE_URL = 'http://localhost:8080';
+    let token = localStorage.getItem('token');
+    let username = localStorage.getItem('username');
+
+    // 检查登录状态
+    if (!token) {
+        window.location.href = 'login.html';
+    }
+
+    // 显示用户名
+    document.getElementById('username').textContent = `欢迎，${username}`;
+
+    // 加载任务列表
+    async function loadTasks() {
+        const sortBy = document.getElementById('sortBy').value;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/tasks?page=0&size=100&sortBy=${sortBy}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.code === 200) {
+                displayTasks(data.data.content);
+            } else {
+                alert('加载任务失败：' + data.message);
+            }
+        } catch (error) {
+            alert('网络错误：' + error.message);
+        }
+    }
+
+    // 显示任务列表
+    function displayTasks(tasks) {
+        const container = document.getElementById('tasksList');
+
+        if (tasks.length === 0) {
+            container.innerHTML = '<div class="empty-state">暂无任务，创建一个吧！</div>';
+            return;
+        }
+
+        container.innerHTML = tasks.map(task => {
+            const statusClass = task.status.toLowerCase();
+            const statusText = {'TODO': '待办', 'DOING': '进行中', 'DONE': '已完成'}[task.status];
+            const deadline = task.deadline ? new Date(task.deadline).toLocaleString('zh-CN') : '无';
+            const isOverdue = task.deadline && new Date(task.deadline) < new Date() && task.status !== 'DONE';
+
+            return `
+                    <div class="task-card ${statusClass} ${isOverdue ? 'overdue' : ''}">
+                        <div class="task-header">
+                            <h4>${task.title}</h4>
+                            <span class="status-badge status-${statusClass}">${statusText}</span>
+                        </div>
+                        <p class="task-description">${task.description || '无描述'}</p>
+                        <div class="task-meta">
+                            <span>⏰ 截止：${deadline}</span>
+                            <span>📅 创建：${new Date(task.createdAt).toLocaleDateString('zh-CN')}</span>
+                        </div>
+                        ${isOverdue ? '<div class="overdue-tag">⚠️ 已逾期</div>' : ''}
+                        <div class="task-actions">
+                            <button class="btn btn-small btn-secondary" onclick="openEditModal(${task.id})">编辑</button>
+                            <button class="btn btn-small btn-danger" onclick="deleteTask(${task.id})">删除</button>
+                        </div>
+                    </div>
+                `;
+        }).join('');
+    }
+
+    // 创建任务
+    async function createTask() {
+        const title = document.getElementById('taskTitle').value;
+        const description = document.getElementById('taskDescription').value;
+        const deadline = document.getElementById('taskDeadline').value;
+        const messageEl = document.getElementById('createMessage');
+
+        if (!title) {
+            showMessage(messageEl, '请输入任务标题', 'error');
+            return;
+        }
+
+        const taskData = { title, description };
+        if (deadline) {
+            taskData.deadline = deadline + ':00';
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/tasks`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(taskData)
+            });
+
+            const data = await response.json();
+
+            if (data.code === 200) {
+                showMessage(messageEl, '任务创建成功！', 'success');
+                document.getElementById('taskTitle').value = '';
+                document.getElementById('taskDescription').value = '';
+                document.getElementById('taskDeadline').value = '';
+                loadTasks();
+            } else {
+                showMessage(messageEl, '创建失败：' + data.message, 'error');
+            }
+        } catch (error) {
+            showMessage(messageEl, '网络错误：' + error.message, 'error');
+        }
+    }
+
+    // 打开编辑模态框
+    async function openEditModal(taskId) {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.code === 200) {
+                const task = data.data;
+                document.getElementById('editTaskId').value = task.id;
+                document.getElementById('editTaskTitle').value = task.title;
+                document.getElementById('editTaskDescription').value = task.description || '';
+                document.getElementById('editTaskStatus').value = task.status;
+
+                if (task.deadline) {
+                    const deadlineDate = new Date(task.deadline);
+                    document.getElementById('editTaskDeadline').value =
+                        deadlineDate.toISOString().slice(0, 16);
+                }
+
+                document.getElementById('editModal').style.display = 'block';
+            }
+        } catch (error) {
+            alert('加载任务失败：' + error.message);
+        }
+    }
+
+    // 关闭编辑模态框
+    function closeEditModal() {
+        document.getElementById('editModal').style.display = 'none';
+    }
+
+    // 更新任务
+    async function updateTask() {
+        const taskId = document.getElementById('editTaskId').value;
+        const title = document.getElementById('editTaskTitle').value;
+        const description = document.getElementById('editTaskDescription').value;
+        const status = document.getElementById('editTaskStatus').value;
+        const deadline = document.getElementById('editTaskDeadline').value;
+
+        const taskData = { title, description, status };
+        if (deadline) {
+            taskData.deadline = deadline + ':00';
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify(taskData)
+            });
+
+            const data = await response.json();
+
+            if (data.code === 200) {
+                alert('任务更新成功！');
+                closeEditModal();
+                loadTasks();
+            } else {
+                alert('更新失败：' + data.message);
+            }
+        } catch (error) {
+            alert('网络错误：' + error.message);
+        }
+    }
+
+    // 删除任务
+    async function deleteTask(taskId) {
+        if (!confirm('确定要删除这个任务吗？')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/tasks/${taskId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.code === 200) {
+                alert('任务删除成功！');
+                loadTasks();
+            } else {
+                alert('删除失败：' + data.message);
+            }
+        } catch (error) {
+            alert('网络错误：' + error.message);
+        }
+    }
+
+    // 退出登录
+    function logout() {
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        window.location.href = 'login.html';
+    }
+
+    // 显示消息
+    function showMessage(element, message, type) {
+        element.textContent = message;
+        element.className = `message ${type}`;
+        element.style.display = 'block';
+        setTimeout(() => {
+            element.style.display = 'none';
+        }, 3000);
+    }
+
+    // 页面加载时加载任务
+    loadTasks();
+</script>
+</body>
+</html>
