@@ -12,10 +12,10 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>taskmanagement</artifactId>
+    <artifactId>playpulse-api</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>taskmanagement</name>
-    <description>Task Management System</description>
+    <name>playpulse-api</name>
+    <description>Cloud-native game feedback platform</description>
 
     <properties>
         <java.version>21</java.version>
@@ -90,6 +90,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
             <scope>test</scope>
         </dependency>
         <!-- AOP -->
