@@ -7,6 +7,9 @@ Players can register, submit bug reports / balance concerns / feature ideas, sea
 ## Run locally
 
 ```powershell
+# Build the Java application package before creating its Docker image.
+.\mvnw.cmd package
+
 # Build and start frontend, API, MySQL and Redis.
 docker compose up --build
 
