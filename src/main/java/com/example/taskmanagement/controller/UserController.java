@@ -10,12 +10,14 @@ import com.example.taskmanagement.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@ConditionalOnExpression("'${app.role:all}' == 'auth' or '${app.role:all}' == 'all'")
 public class UserController {
 
     private final UserService userService;

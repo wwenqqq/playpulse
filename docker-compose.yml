@@ -3,15 +3,22 @@ services:
     image: mysql:8.4
     environment: {MYSQL_DATABASE: playpulse, MYSQL_USER: playpulse, MYSQL_PASSWORD: playpulse, MYSQL_ROOT_PASSWORD: local-root-password}
     volumes: [mysql_data:/var/lib/mysql]
-    healthcheck: {test: [CMD, mysqladmin, ping, -h, localhost, -plocal-root-password], interval: 10s, timeout: 5s, retries: 12}
-  redis:
-    image: redis:7-alpine
-  api:
+    healthcheck: {test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-plocal-root-password"], interval: 10s, timeout: 5s, retries: 12}
+  redis: {image: redis:7-alpine}
+  auth-service:
     build: .
-    environment: {DB_URL: jdbc:mysql://mysql:3306/playpulse?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true, DB_USERNAME: playpulse, DB_PASSWORD: playpulse, REDIS_HOST: redis, JWT_SECRET: playpulse-demo-secret-change-before-cloud-deployment-2026}
+    environment: &common {APP_ROLE: auth, DB_URL: jdbc:mysql://mysql:3306/playpulse?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true, DB_USERNAME: playpulse, DB_PASSWORD: playpulse, REDIS_HOST: redis, JWT_SECRET: playpulse-demo-secret-change-before-cloud-deployment-2026}
+    depends_on: {mysql: {condition: service_healthy}, redis: {condition: service_started}}
+  feedback-service:
+    build: .
+    environment: {<<: *common, APP_ROLE: feedback}
+    depends_on: {mysql: {condition: service_healthy}, redis: {condition: service_started}}
+  interaction-service:
+    build: .
+    environment: {<<: *common, APP_ROLE: interaction}
     depends_on: {mysql: {condition: service_healthy}, redis: {condition: service_started}}
   frontend:
     build: ./frontend
     ports: ["8088:80"]
-    depends_on: [api]
+    depends_on: [auth-service, feedback-service, interaction-service]
 volumes: {mysql_data: {}}
