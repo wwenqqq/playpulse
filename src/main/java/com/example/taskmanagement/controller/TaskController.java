@@ -11,10 +11,12 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 @RestController
 @RequestMapping("/api/tasks")
 @RequiredArgsConstructor
+@ConditionalOnProperty(name = "legacy.tasks.enabled", havingValue = "true")
 public class TaskController {
 
     private final TaskService taskService;
