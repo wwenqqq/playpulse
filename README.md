@@ -1,43 +1,55 @@
 # PlayPulse
 
-PlayPulse is a cloud-native game QA and player-feedback platform for the INFS3208 Type I Individual Project.
+PlayPulse is a cloud-native game QA and player-feedback platform for the INFS3208 Type I Individual Project. Players can register, submit bug reports, balance concerns and feature ideas, search community feedback, vote, comment, and review their own submissions.
 
-Players can register, submit bug reports / balance concerns / feature ideas, search community feedback, and vote for the issues that matter. The project uses Spring Boot, MySQL, Redis, Docker and Kubernetes. Authentication, feedback and interaction APIs run as independent service roles behind the Nginx gateway.
+The system uses Spring Boot, MySQL, Redis, Docker and Kubernetes. Authentication, feedback and interaction run as separate service roles behind an Nginx frontend gateway.
 
 ## Run locally
 
 ```powershell
-# Build the Java application package before creating its Docker image.
-.\mvnw.cmd package
-
-# Build and start frontend, API, MySQL and Redis.
 docker compose up --build
-
-# Open http://localhost:8088
 ```
 
-## Assessment demonstrations
+Open `http://localhost:8088`.
 
-```powershell
-# Apply the cloud deployment after replacing image names and secret placeholders.
-kubectl apply -f k8s/playpulse.yaml
+## Deploy to Google Kubernetes Engine
 
-# Demonstrate manual scale-out.
+The deployment script builds the API and frontend with Cloud Build, uploads them to Artifact Registry, creates a one-node GKE Standard cluster only when it does not already exist, generates Kubernetes secrets, and deploys the application. It does not commit credentials or passwords to Git.
+
+1. Open Google Cloud Shell and clone this repository.
+2. Find the GCP project ID with `gcloud projects list`.
+3. From the repository root, run the following command. It creates billable resources, so only run it after confirming that the education credit is active.
+
+```bash
+bash k8s/deploy-gke.sh --create-cluster YOUR_PROJECT_ID australia-southeast1-a
+```
+
+4. Wait for the final `kubectl get service frontend -n playpulse` output to show an `EXTERNAL-IP`, then open that IP in a browser.
+
+The script uses the `australia-southeast1-a` zone and an `e2-standard-4` node. The MySQL database has a 10 GiB persistent disk. When the demo is complete, delete the cluster to stop compute charges:
+
+```bash
+gcloud container clusters delete playpulse-cluster --zone australia-southeast1-a
+```
+
+## Demonstrate cloud capabilities
+
+```bash
+# Scale the feedback service.
 kubectl scale deployment feedback-service -n playpulse --replicas=4
 
-# Demonstrate Kubernetes self-healing.
+# Show self-healing: Kubernetes creates a replacement pod.
 kubectl delete pod -n playpulse -l app=feedback-service
 
-# Demonstrate a rolling update and rollback.
-kubectl set image deployment/feedback-service feedback-service=REGISTRY/playpulse-api:1.0.1 -n playpulse
-kubectl rollout status deployment/feedback-service -n playpulse
+# Show rolling update and rollback after deploying a new image tag.
+kubectl rollout history deployment/feedback-service -n playpulse
 kubectl rollout undo deployment/feedback-service -n playpulse
 ```
 
-## Validation
+## Validate the backend
 
 ```powershell
 .\mvnw.cmd test
 ```
 
-Do not commit real cloud credentials or registry tokens. The Kubernetes MySQL workload is for an assessment demonstration only; a persistent or managed database should be used for a long-lived deployment.
+Do not commit cloud credentials, coupon codes or generated secrets. The in-cluster MySQL deployment is appropriate for this assessment demonstration; a production system should use a managed database.
