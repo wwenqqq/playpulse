@@ -1,8 +1,8 @@
-# PlayPulse
+# GameShelf
 
-PlayPulse is a cloud-native game QA and player-feedback platform for the INFS3208 Type I Individual Project. Players can register, submit bug reports, balance concerns and feature ideas, search community feedback, vote, comment, and review their own submissions.
+GameShelf is a cloud-native game discovery, review and personal-library platform for the INFS3208 Type I Individual Project. It is a Steam-style experience built around an original catalogue rather than Steam data or branding. Players can register, browse games, open an individual game page, save games to a Wishlist / Playing / Completed library, publish reviews, vote on useful reviews and join review discussions.
 
-The system uses Spring Boot, MySQL, Redis, Docker and Kubernetes. Authentication, feedback and interaction run as separate service roles behind an Nginx frontend gateway.
+The system uses Spring Boot, MySQL, Redis, Docker and Kubernetes. Authentication, game/review and interaction run as separate service roles behind an Nginx frontend gateway. The game catalogue is seeded with original fictional titles when the database is first created.
 
 ## Run locally
 
