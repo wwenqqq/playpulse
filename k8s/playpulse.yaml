@@ -109,6 +109,7 @@ spec:
           ports: [{name: http, containerPort: 8080}]
           env:
             - {name: APP_ROLE, value: auth}
+            - {name: SPRING_JPA_HIBERNATE_DDL_AUTO, value: none}
             - {name: DB_URL, value: "jdbc:mysql://mysql:3306/playpulse?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true"}
             - {name: DB_USERNAME, value: playpulse}
             - {name: REDIS_HOST, value: redis}
@@ -157,6 +158,7 @@ spec:
           ports: [{name: http, containerPort: 8080}]
           env:
             - {name: APP_ROLE, value: feedback}
+            - {name: SPRING_JPA_HIBERNATE_DDL_AUTO, value: update}
             - {name: DB_URL, value: "jdbc:mysql://mysql:3306/playpulse?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true"}
             - {name: DB_USERNAME, value: playpulse}
             - {name: REDIS_HOST, value: redis}
@@ -218,6 +220,7 @@ spec:
           ports: [{name: http, containerPort: 8080}]
           env:
             - {name: APP_ROLE, value: interaction}
+            - {name: SPRING_JPA_HIBERNATE_DDL_AUTO, value: none}
             - {name: DB_URL, value: "jdbc:mysql://mysql:3306/playpulse?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true"}
             - {name: DB_USERNAME, value: playpulse}
             - {name: REDIS_HOST, value: redis}

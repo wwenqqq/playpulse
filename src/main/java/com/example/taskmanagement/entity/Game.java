@@ -2,6 +2,8 @@ package com.example.taskmanagement.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -14,4 +16,6 @@ public class Game {
     @Column(nullable = false, length = 120) private String genres;
     @Column(nullable = false, length = 24) private String coverTone;
     @Column(nullable = false, columnDefinition = "TEXT") private String summary;
+    @Column(name = "created_by") private Long createdBy;
+    @CreationTimestamp @Column(name = "created_at", updatable = false) private LocalDateTime createdAt;
 }

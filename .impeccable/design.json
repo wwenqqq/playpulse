@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-14T00:00:00+10:00",
+  "title": "Design System: GameShelf",
+  "extensions": {
+    "colorMeta": {
+      "warm-black": {"role": "neutral", "displayName": "Warm Black", "canonical": "#11100e"},
+      "panel": {"role": "neutral", "displayName": "Panel Brown-Black", "canonical": "#1d1b17"},
+      "bone-text": {"role": "neutral", "displayName": "Bone Text", "canonical": "#f4efe5"},
+      "amber": {"role": "primary", "displayName": "Shelf Amber", "canonical": "#e8b45d"},
+      "danger": {"role": "error", "displayName": "Danger Coral", "canonical": "#f09a87"}
+    },
+    "typographyMeta": {
+      "display": {"displayName": "Display", "purpose": "Short page-level headings."},
+      "body": {"displayName": "Body", "purpose": "Editorial copy and interface text."},
+      "label": {"displayName": "Label", "purpose": "Compact controls and metadata."}
+    },
+    "shadows": [
+      {"name": "focused-field", "value": "0 10px 30px rgba(0,0,0,.18)", "purpose": "Active input separation."},
+      {"name": "resting-card", "value": "0 18px 46px rgba(0,0,0,.16)", "purpose": "Quiet catalogue-card depth."},
+      {"name": "lifted-card", "value": "0 26px 60px rgba(0,0,0,.26)", "purpose": "Catalogue-card hover response."},
+      {"name": "panel", "value": "0 26px 70px rgba(0,0,0,.24)", "purpose": "Form and account panels."}
+    ],
+    "motion": [
+      {"name": "ease-signature", "value": "cubic-bezier(.16,1,.3,1)", "purpose": "Directional UI transitions."},
+      {"name": "state-fast", "value": ".22s ease", "purpose": "Control states."},
+      {"name": "card-lift", "value": ".45s cubic-bezier(.16,1,.3,1)", "purpose": "Catalogue-card movement."}
+    ],
+    "breakpoints": [
+      {"name": "card-stack", "value": "900px"},
+      {"name": "compact-page", "value": "640px"},
+      {"name": "card-vertical", "value": "560px"}
+    ]
+  },
+  "components": [
+    {"name": "Primary Button", "kind": "button", "refersTo": "button-primary", "description": "Main task action.", "html": "<button class=\"ds-button-primary\">Add game</button>", "css": ".ds-button-primary{min-height:3rem;padding:0 1.15rem;border:1px solid #e8b45d;border-radius:8px;color:#19150d;background:#e8b45d;font:650 .78rem Aptos,sans-serif}.ds-button-primary:hover{background:#f4c978}.ds-button-primary:focus-visible{outline:2px solid #f4c978;outline-offset:4px}"},
+    {"name": "Secondary Button", "kind": "button", "refersTo": "button-secondary", "description": "Lower-emphasis action.", "html": "<button class=\"ds-button-secondary\">Search</button>", "css": ".ds-button-secondary{min-height:3rem;padding:0 1.15rem;border:1px solid #5b5244;border-radius:8px;color:#f4efe5;background:transparent;font:650 .78rem Aptos,sans-serif}.ds-button-secondary:hover{border-color:#e8b45d;color:#11100e;background:#e8b45d}.ds-button-secondary:focus-visible{outline:2px solid #f4c978;outline-offset:4px}"},
+    {"name": "Text Input", "kind": "input", "refersTo": "input", "description": "Search and form field.", "html": "<input class=\"ds-input\" placeholder=\"Search games or studios\">", "css": ".ds-input{min-height:3rem;padding:0 .9rem;border:1px solid #3d382f;border-radius:8px;color:#f4efe5;background:#171612;font:400 1rem Aptos,sans-serif}.ds-input:focus{border-color:#bd8d43;outline:2px solid #f4c978;outline-offset:4px}"},
+    {"name": "Navigation", "kind": "nav", "description": "Primary product navigation.", "html": "<nav class=\"ds-nav\"><a class=\"ds-nav-active\" href=\"#\">Discover</a><a href=\"#\">Browse games</a><a href=\"#\">Contribute</a></nav>", "css": ".ds-nav{display:flex;gap:1.75rem;background:#11100e}.ds-nav a{padding:.6rem 0;color:#aaa294;text-decoration:none;font:560 .82rem Aptos,sans-serif}.ds-nav a:hover,.ds-nav .ds-nav-active{color:#f4efe5}.ds-nav a:focus-visible{outline:2px solid #f4c978;outline-offset:4px}"},
+    {"name": "Game Card", "kind": "card", "refersTo": "game-card", "description": "Catalogue preview with cover and editorial copy.", "html": "<article class=\"ds-game-card\"><div class=\"ds-cover\">GS</div><div><h3>Signal Lost</h3><p>A concise player-maintained catalogue summary.</p></div></article>", "css": ".ds-game-card{display:grid;grid-template-columns:7.5rem 1fr;overflow:hidden;border-radius:14px;color:#f4efe5;background:#1d1b17;box-shadow:0 18px 46px rgba(0,0,0,.16)}.ds-game-card>div:last-child{padding:1.3rem}.ds-game-card p{color:#aaa294}.ds-cover{display:grid;place-items:end start;padding:1rem;color:#17130d;background:#e8b45d;font:720 2rem Aptos,sans-serif}.ds-game-card:hover{background:#24211c;transform:translateY(-5px)}"}
+  ],
+  "narrative": {
+    "northStar": "The Quiet Game Almanac",
+    "overview": "A warm, dark and composed editorial catalogue where games and player writing carry the experience.",
+    "keyCharacteristics": ["Warm-black, bone and amber hierarchy", "Broad editorial type", "Thin rules and restrained elevation", "Small directional motion"],
+    "rules": [
+      {"name": "The One Amber Voice Rule", "body": "Amber identifies meaning or action and never covers large page surfaces.", "section": "colors"},
+      {"name": "The Breathing-Room Rule", "body": "Preserve large section intervals and short text measures.", "section": "layout"},
+      {"name": "The Flat-by-Default Rule", "body": "Dividers and tonal shifts establish structure before shadows.", "section": "elevation"}
+    ],
+    "dos": ["Preserve the warm-black, bone-white and amber hierarchy.", "Keep copy within the established reading widths.", "Retain visible focus and reduced-motion behavior."],
+    "donts": ["Do not introduce neon gradients or glassmorphism.", "Do not turn every section into a card.", "Do not use cover tones as interface chrome."]
+  }
+}

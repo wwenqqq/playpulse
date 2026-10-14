@@ -32,3 +32,9 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Local assessment evidence and generated design review files
+evidence/
+.impeccable/review/
+.impeccable/mocks/
+.impeccable/questions/

@@ -7,11 +7,11 @@ services:
   redis: {image: redis:7-alpine}
   auth-service:
     build: .
-    environment: &common {APP_ROLE: auth, DB_URL: jdbc:mysql://mysql:3306/playpulse?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true, DB_USERNAME: playpulse, DB_PASSWORD: playpulse, REDIS_HOST: redis, JWT_SECRET: playpulse-demo-secret-change-before-cloud-deployment-2026}
+    environment: &common {APP_ROLE: auth, DB_URL: jdbc:mysql://mysql:3306/playpulse?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true, DB_USERNAME: playpulse, DB_PASSWORD: playpulse, REDIS_HOST: redis, JWT_SECRET: playpulse-demo-secret-change-before-cloud-deployment-2026, SPRING_JPA_HIBERNATE_DDL_AUTO: none}
     depends_on: {mysql: {condition: service_healthy}, redis: {condition: service_started}}
   feedback-service:
     build: .
-    environment: {<<: *common, APP_ROLE: feedback}
+    environment: {<<: *common, APP_ROLE: feedback, SPRING_JPA_HIBERNATE_DDL_AUTO: update}
     depends_on: {mysql: {condition: service_healthy}, redis: {condition: service_started}}
   interaction-service:
     build: .

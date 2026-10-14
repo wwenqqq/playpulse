@@ -1,3 +1,3 @@
-.brand{gap:0;color:var(--acid)}
-.brand-mark{width:2.05rem;height:2.05rem;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:square;stroke-linejoin:miter;filter:drop-shadow(0 0 .35rem rgba(200,246,107,.18));transition:transform .2s,color .2s}
-.brand:hover .brand-mark{color:#e1ff9d;transform:translateX(2px)}
+.brand{color:var(--accent)}
+.brand-mark{width:2rem;height:2rem;overflow:visible;fill:none;stroke:currentColor;stroke-width:1.65;stroke-linecap:square;stroke-linejoin:miter;transition:transform .35s var(--ease),color .2s ease}
+.brand:hover .brand-mark{color:var(--accent-bright);transform:translateX(3px)}

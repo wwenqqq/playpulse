@@ -1,15 +1,15 @@
 spring:
   application:
-    name: playpulse-api
+    name: gameshelf-api
 
-  # 数据库配置
+  # Container deployments override the local MySQL defaults.
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DB_URL:jdbc:mysql://localhost:3306/playpulse?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true}
     username: ${DB_USERNAME:playpulse}
     password: ${DB_PASSWORD:playpulse}
 
-  # JPA配置
+  # Only the feedback role updates the schema in multi-service deployments.
   jpa:
     hibernate:
       ddl-auto: update
@@ -19,7 +19,7 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQLDialect
 
-  # Redis配置
+  # Shared Redis connection.
   data:
     redis:
       host: ${REDIS_HOST:localhost}
@@ -32,7 +32,6 @@ spring:
           max-idle: 8
           min-idle: 0
 
-# 服务器端口
 server:
   port: ${SERVER_PORT:8080}
 
@@ -46,23 +45,23 @@ management:
       probes:
         enabled: true
 
-# JWT配置
+# Always override this demonstration secret in cloud deployments.
 jwt:
   secret: ${JWT_SECRET:playpulse-demo-secret-change-before-cloud-deployment-2026}
   expiration: 2592000000
 
-# Knife4j配置
 springdoc:
   api-docs:
     enabled: true
   group-configs:
-    - group: 'default'
+    - group: default
       paths-to-match: '/**'
       packages-to-scan: com.example.taskmanagement.controller
+
 knife4j:
   enable: true
   setting:
-    language: zh-CN
+    language: EN
 
 app:
   role: ${APP_ROLE:all}

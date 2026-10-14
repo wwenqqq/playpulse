@@ -2,6 +2,7 @@ package com.example.taskmanagement.service;
 
 import com.example.taskmanagement.entity.Game;
 import com.example.taskmanagement.entity.LibraryEntry;
+import com.example.taskmanagement.dto.GameCreateDTO;
 import com.example.taskmanagement.repository.GameRepository;
 import com.example.taskmanagement.repository.LibraryEntryRepository;
 import jakarta.annotation.PostConstruct;
@@ -33,6 +34,15 @@ public class GameCatalogService {
     }
     public List<Game> list(String search) { return search == null || search.isBlank() ? games.findAll() : games.findByTitleContainingIgnoreCaseOrStudioContainingIgnoreCase(search, search); }
     public Game get(Long id) { return games.findById(id).orElseThrow(() -> new RuntimeException("Game not found")); }
+    @Transactional public Game create(Long userId, GameCreateDTO data) {
+        if (games.existsByTitle(data.getTitle().trim())) throw new RuntimeException("A game with this title already exists. Search the catalogue first.");
+        Game game = new Game();
+        game.setTitle(data.getTitle().trim()); game.setStudio(data.getStudio().trim());
+        game.setReleaseYear(data.getReleaseYear()); game.setGenres(data.getGenres().trim());
+        game.setCoverTone(data.getCoverTone()); game.setSummary(data.getSummary().trim()); game.setCreatedBy(userId);
+        try { return games.saveAndFlush(game); }
+        catch (DataIntegrityViolationException ignored) { throw new RuntimeException("A game with this title already exists. Search the catalogue first."); }
+    }
     @Transactional public LibraryEntry saveLibrary(Long userId, Long gameId, LibraryEntry.Status status) {
         get(gameId);
         LibraryEntry entry = library.findByUserIdAndGameId(userId, gameId).orElseGet(() -> { LibraryEntry next = new LibraryEntry(); next.setUserId(userId); next.setGameId(gameId); return next; });

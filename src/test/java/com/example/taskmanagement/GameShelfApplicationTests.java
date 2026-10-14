@@ -6,10 +6,8 @@ import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
 @ActiveProfiles("test")
-class TaskmanagementApplicationTests {
-
+class GameShelfApplicationTests {
     @Test
     void contextLoads() {
     }
-
 }

@@ -1,6 +1,65 @@
 <!doctype html>
 <html lang="en" data-page="submit">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="description" content="Write a game review on GameShelf."><meta name="theme-color" content="#0c1014"><title>Write review · GameShelf</title><link rel="stylesheet" href="app.css"><link rel="stylesheet" href="brand.css"><link rel="stylesheet" href="game.css"></head>
-<body><a class="skip" href="#main">Skip to review form</a><header class="site-header"><a class="brand" href="index.html" aria-label="GameShelf home"><svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true"><path d="M3 16h5l3-7 4 12 3-7h7"/></svg><span>GameShelf</span></a><nav aria-label="Primary"><a href="index.html">Discover</a><a href="board.html">Browse games</a><a class="active" href="submit.html">Write review</a><a href="account.html">My library</a></nav><div class="session"><span id="session-name">Guest session</span><a id="account-link" href="account.html">Sign in</a><button id="signout" class="text-button" hidden type="button">Sign out</button></div></header>
-  <main id="main" class="page page-form"><section class="form-aside"><p class="eyebrow">Player note</p><h1>Make your time with it <em>useful.</em></h1><div class="field-note"><span>01</span><p>Name the part that stayed with you.</p></div><div class="field-note"><span>02</span><p>Give readers a little context.</p></div><div class="field-note"><span>03</span><p>Recommend it honestly.</p></div></section><section class="form-panel"><form id="feedback-form" novalidate><div class="field"><label for="game-id">Game</label><select id="game-id" required></select></div><div class="field"><label for="title">Review headline</label><input id="title" maxlength="120" required placeholder="One clear takeaway"></div><div class="field"><label for="description">Your note</label><textarea id="description" maxlength="3000" required placeholder="What worked, what did not, and who might enjoy it?"></textarea></div><div class="field"><label for="category">Review type</label><select id="category"><option value="REVIEW">Review</option><option value="RECOMMEND">Recommend</option><option value="CRITIQUE">Critique</option></select></div><p id="submit-message" class="form-message" aria-live="polite">Sign in before publishing a review.</p><button class="button" type="submit">Publish review</button></form></section></main>
-  <footer><a href="board.html">Back to games &rarr;</a></footer><script src="app.js?v=3"></script></body></html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Add a game or write a player review on GameShelf.">
+  <meta name="theme-color" content="#11100e">
+  <title>Contribute / GameShelf</title>
+  <link rel="stylesheet" href="app.css">
+  <link rel="stylesheet" href="brand.css">
+  <link rel="stylesheet" href="game.css">
+</head>
+<body>
+  <a class="skip" href="#main">Skip to contribution forms</a>
+  <header class="site-header">
+    <a class="brand" href="index.html" aria-label="GameShelf home"><svg class="brand-mark" viewBox="0 0 28 28" aria-hidden="true"><path d="M3 16h5l3-7 4 12 3-7h7"/></svg><span>GameShelf</span></a>
+    <nav aria-label="Primary"><a href="index.html">Discover</a><a href="board.html">Browse games</a><a class="active" aria-current="page" href="submit.html">Contribute</a><a href="account.html">My library</a></nav>
+    <div class="session"><span id="session-name">Guest session</span><a id="account-link" href="account.html">Sign in</a><button id="signout" class="text-button" hidden type="button">Sign out</button></div>
+  </header>
+  <main id="main" class="page page-form">
+    <section class="form-aside">
+      <h1>Add to the shelf. <em>Share what mattered.</em></h1>
+      <p>Missing a game? Add a concise catalogue entry first. If it is already here, leave a review that helps another player decide.</p>
+      <div class="contribution-guide">
+        <p><strong>Add a game</strong><span>Title, studio, year, genres and a short summary.</span></p>
+        <p><strong>Write a review</strong><span>Your takeaway, context and honest recommendation.</span></p>
+      </div>
+    </section>
+    <section class="form-panel">
+      <div class="tab-row contribution-tabs" role="tablist" aria-label="Contribution type">
+        <button id="add-game-tab" class="active" type="button" role="tab" aria-selected="true" aria-controls="game-create-panel">Add a game</button>
+        <button id="review-tab" type="button" role="tab" aria-selected="false" aria-controls="review-panel" tabindex="-1">Write a review</button>
+      </div>
+      <div id="game-create-panel" class="tab-panel" role="tabpanel" aria-labelledby="add-game-tab">
+        <form id="game-form" novalidate>
+          <div class="form-row">
+            <div class="field"><label for="game-title">Game title</label><input id="game-title" maxlength="120" required autocomplete="off" aria-describedby="game-submit-message" placeholder="A precise title"></div>
+            <div class="field"><label for="game-studio">Studio</label><input id="game-studio" maxlength="90" required autocomplete="organization" aria-describedby="game-submit-message" placeholder="Developer or studio"></div>
+          </div>
+          <div class="form-row">
+            <div class="field"><label for="game-year">Release year</label><input id="game-year" type="number" min="1950" max="2100" required inputmode="numeric" aria-describedby="game-submit-message" placeholder="2026"></div>
+            <div class="field"><label for="game-genres">Genres</label><input id="game-genres" maxlength="120" required aria-describedby="game-submit-message" placeholder="Adventure, Puzzle"></div>
+          </div>
+          <div class="field"><label for="game-summary">Catalogue summary</label><textarea id="game-summary" maxlength="3000" required aria-describedby="game-submit-message" placeholder="Describe the premise and play experience without marketing language."></textarea></div>
+          <div class="field"><label for="game-tone">Cover colour</label><select id="game-tone"><option value="amber">Amber</option><option value="lime">Lime</option><option value="cyan">Cyan</option><option value="violet">Violet</option><option value="rose">Rose</option><option value="ice">Ice</option></select></div>
+          <p id="game-submit-message" class="form-message" aria-live="polite">Sign in before adding a game.</p>
+          <button class="button" type="submit">Add game to catalogue</button>
+        </form>
+      </div>
+      <div id="review-panel" class="tab-panel" role="tabpanel" aria-labelledby="review-tab" hidden>
+        <form id="feedback-form" novalidate>
+          <div class="field"><label for="game-id">Game</label><select id="game-id" required></select></div>
+          <div class="field"><label for="title">Review headline</label><input id="title" maxlength="120" required aria-describedby="submit-message" placeholder="One clear takeaway"></div>
+          <div class="field"><label for="description">Your note</label><textarea id="description" maxlength="3000" required aria-describedby="submit-message" placeholder="What worked, what did not, and who might enjoy it?"></textarea></div>
+          <div class="field"><label for="category">Review type</label><select id="category"><option value="REVIEW">Review</option><option value="RECOMMEND">Recommend</option><option value="CRITIQUE">Critique</option></select></div>
+          <p id="submit-message" class="form-message" aria-live="polite">Sign in before publishing a review.</p>
+          <button class="button" type="submit">Publish review</button>
+        </form>
+      </div>
+    </section>
+  </main>
+  <footer><a href="board.html">Back to games &rarr;</a></footer>
+  <script src="app.js?v=5"></script>
+</body>
+</html>
