@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Optional;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -24,6 +26,23 @@ class GameCatalogServiceTest {
     @Mock private GameRepository games;
     @Mock private LibraryEntryRepository library;
     @InjectMocks private GameCatalogService service;
+
+    @Test
+    void seedCatalogueMigratesLegacyGamesWithoutChangingTheirIdentity() {
+        Game legacy = new Game();
+        legacy.setId(7L);
+        legacy.setTitle("Signal Lost");
+        when(games.findByTitle("Signal Lost")).thenReturn(Optional.of(legacy));
+        when(games.saveAndFlush(any(Game.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        service.seedCatalogue();
+
+        assertEquals(7L, legacy.getId());
+        assertEquals("Minecraft", legacy.getTitle());
+        assertEquals("Mojang Studios", legacy.getStudio());
+        assertEquals(2011, legacy.getReleaseYear());
+        assertEquals("Sandbox, Survival", legacy.getGenres());
+    }
 
     @Test
     void createStoresTrimmedCatalogueEntryAndCreator() {

@@ -20,12 +20,22 @@ public class GameCatalogService {
 
     @PostConstruct
     void seedCatalogue() {
-        seed("Signal Lost", "Northstar Assembly", 2025, "Narrative, Adventure", "lime", "A maintenance technician follows a fading broadcast through an abandoned orbital station.");
-        seed("Rook & River", "Cairn Studio", 2024, "Strategy, Roguelite", "amber", "Build a tiny kingdom one uncertain season at a time.");
-        seed("After the Rain", "Mallow Works", 2026, "Cozy, Simulation", "violet", "Restore a rain-soaked coastal town, one small kindness at a time.");
-        seed("Hollow Circuit", "Vectorline", 2023, "Action, Sci-fi", "cyan", "Dash through a fractured simulation where every arena changes the rules.");
-        seed("Paper Wilds", "Kinfolk Games", 2025, "Exploration, Puzzle", "rose", "Map a folded world that opens differently for every traveller.");
-        seed("Frostline", "Blue Lantern", 2024, "Survival, Co-op", "ice", "Keep a remote research crew alive through a long polar night.");
+        migrateSeed("Signal Lost", "Minecraft", "Mojang Studios", 2011, "Sandbox, Survival", "lime", "Explore an endless block-built world, gather resources and create anything from a first shelter to a vast shared city.");
+        migrateSeed("Rook & River", "Stardew Valley", "ConcernedApe", 2016, "Farming, Simulation", "amber", "Restore an inherited farm, get to know Pelican Town and shape a gentle routine across changing seasons.");
+        migrateSeed("After the Rain", "Terraria", "Re-Logic", 2011, "Sandbox, Adventure", "violet", "Dig, build and battle through a layered pixel world filled with hidden biomes, bosses and improbable equipment.");
+        migrateSeed("Hollow Circuit", "Elden Ring", "FromSoftware", 2022, "Action RPG, Fantasy", "rose", "Cross the Lands Between, master demanding combat and piece together a vast dark fantasy shaped by exploration.");
+        migrateSeed("Paper Wilds", "Hollow Knight", "Team Cherry", 2017, "Metroidvania, Action", "cyan", "Descend into Hallownest to uncover forgotten paths, precise battles and the history of a fallen insect kingdom.");
+        migrateSeed("Frostline", "Hades", "Supergiant Games", 2020, "Roguelike, Action", "ice", "Fight out of the Underworld through fast repeatable runs where every defeat reveals new powers, characters and stories.");
+    }
+    private void migrateSeed(String legacyTitle, String title, String studio, int year, String genres, String tone, String summary) {
+        if (games.existsByTitle(title)) return;
+        Optional<Game> legacy = games.findByTitle(legacyTitle);
+        if (legacy.isEmpty()) { seed(title, studio, year, genres, tone, summary); return; }
+        Game game = legacy.get();
+        game.setTitle(title); game.setStudio(studio); game.setReleaseYear(year);
+        game.setGenres(genres); game.setCoverTone(tone); game.setSummary(summary);
+        try { games.saveAndFlush(game); }
+        catch (DataIntegrityViolationException ignored) { /* another replica migrated this game first */ }
     }
     private void seed(String title, String studio, int year, String genres, String tone, String summary) {
         if (games.existsByTitle(title)) return;
