@@ -16,7 +16,7 @@
         <div class="tab-row" role="tablist" aria-label="Account action"><button id="login-tab" class="active" type="button" role="tab" aria-selected="true" aria-controls="auth-form">Sign in</button><button id="register-tab" type="button" role="tab" aria-selected="false" aria-controls="auth-form" tabindex="-1">Create account</button></div>
         <form id="auth-form" role="tabpanel" aria-labelledby="login-tab" novalidate>
           <div class="field"><label for="auth-username">Username</label><input id="auth-username" required minlength="3" autocomplete="username" aria-describedby="auth-message" placeholder="Your player name"></div>
-          <div class="field"><label for="auth-password">Password</label><input id="auth-password" required minlength="4" type="password" autocomplete="current-password" aria-describedby="auth-message" placeholder="Your password"></div>
+          <div class="field"><label for="auth-password">Password</label><input id="auth-password" required minlength="6" maxlength="20" type="password" autocomplete="current-password" aria-describedby="auth-message" placeholder="6 to 20 characters"></div>
           <p id="auth-message" class="form-message" aria-live="polite"></p><button id="auth-submit" class="button" type="submit">Sign in</button>
         </form>
       </div>

@@ -9,8 +9,8 @@ import com.example.taskmanagement.service.UserService;
 import com.example.taskmanagement.util.JwtUtil;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -23,36 +23,35 @@ public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
-    @LogOperation("用户注册")
+    @LogOperation("Register user")
     @PostMapping("/register")
     public Result<User> register(@Valid @RequestBody UserRegisterDTO dto) {
         User user = userService.register(dto);
         user.setPassword(null);
-        return Result.success("注册成功", user);
+        return Result.success("Account created", user);
     }
 
-    @LogOperation("用户登录")
+    @LogOperation("Sign in user")
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@Valid @RequestBody UserLoginDTO dto) {
-        Map<String, Object> result = userService.login(dto);
-        return Result.success("登录成功", result);
+        return Result.success("Signed in", userService.login(dto));
     }
 
-    @LogOperation("获取用户信息")
+    @LogOperation("Get current user")
     @GetMapping("/info")
     public Result<User> getUserInfo(@RequestHeader("Authorization") String authorization) {
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            return Result.error("未登录或token无效");
+            return Result.error("Authentication required");
         }
 
         String token = authorization.substring(7);
         if (!jwtUtil.validateToken(token)) {
-            return Result.error("token无效或已过期");
+            return Result.error("Your session is invalid or has expired");
         }
 
         Long userId = jwtUtil.getUserIdFromToken(token);
         User user = userService.getUserInfo(userId);
         user.setPassword(null);
-        return Result.success("获取成功", user);
+        return Result.success("User loaded", user);
     }
 }

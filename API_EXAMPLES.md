@@ -24,7 +24,7 @@ TOKEN="PASTE_JWT_HERE"
 
 ```bash
 curl http://localhost:8088/api/games
-curl "http://localhost:8088/api/games?search=signal"
+curl "http://localhost:8088/api/games?search=minecraft"
 curl http://localhost:8088/api/games/1
 ```
 

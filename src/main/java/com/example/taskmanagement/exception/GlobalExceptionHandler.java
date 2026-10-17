@@ -12,37 +12,28 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 处理运行时异常
     @ExceptionHandler(RuntimeException.class)
-    public Result<Void> handleRuntimeException(RuntimeException e) {
-        e.printStackTrace();
-        return Result.error(e.getMessage());
+    public Result<Void> handleRuntimeException(RuntimeException exception) {
+        return Result.error(exception.getMessage());
     }
 
-    // 处理参数校验异常
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public Result<Void> handleValidationException(MethodArgumentNotValidException e) {
-        String errors = e.getBindingResult().getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining(", "));
-        return Result.error(400, errors);
+    public Result<Void> handleValidationException(MethodArgumentNotValidException exception) {
+        return Result.error(400, validationMessages(exception.getBindingResult().getFieldErrors().stream()));
     }
 
-    // 处理绑定异常
     @ExceptionHandler(BindException.class)
-    public Result<Void> handleBindException(BindException e) {
-        String errors = e.getBindingResult().getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.joining(", "));
-        return Result.error(400, errors);
+    public Result<Void> handleBindException(BindException exception) {
+        return Result.error(400, validationMessages(exception.getBindingResult().getFieldErrors().stream()));
     }
 
-    // 处理所有其他异常
     @ExceptionHandler(Exception.class)
-    public Result<Void> handleException(Exception e) {
-        e.printStackTrace();
-        return Result.error("服务器内部错误: " + e.getMessage());
+    public Result<Void> handleException(Exception exception) {
+        exception.printStackTrace();
+        return Result.error("Internal server error");
+    }
+
+    private String validationMessages(java.util.stream.Stream<FieldError> errors) {
+        return errors.map(FieldError::getDefaultMessage).collect(Collectors.joining(", "));
     }
 }

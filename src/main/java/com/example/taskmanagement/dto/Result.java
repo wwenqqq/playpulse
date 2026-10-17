@@ -8,7 +8,6 @@ public class Result<T> {
     private String message;
     private T data;
 
-    // 成功返回（带数据）
     public static <T> Result<T> success(T data) {
         Result<T> result = new Result<>();
         result.setCode(200);
@@ -17,7 +16,6 @@ public class Result<T> {
         return result;
     }
 
-    // 成功返回（带消息和数据）
     public static <T> Result<T> success(String message, T data) {
         Result<T> result = new Result<>();
         result.setCode(200);
@@ -26,7 +24,6 @@ public class Result<T> {
         return result;
     }
 
-    // 成功返回（只有消息，无数据）
     public static Result<String> success(String message) {
         Result<String> result = new Result<>();
         result.setCode(200);
@@ -35,15 +32,10 @@ public class Result<T> {
         return result;
     }
 
-    // 失败返回
     public static <T> Result<T> error(String message) {
-        Result<T> result = new Result<>();
-        result.setCode(500);
-        result.setMessage(message);
-        return result;
+        return error(500, message);
     }
 
-    // 失败返回（自定义状态码）
     public static <T> Result<T> error(Integer code, String message) {
         Result<T> result = new Result<>();
         result.setCode(code);

@@ -22,6 +22,8 @@ import java.lang.reflect.Method;
 @RequiredArgsConstructor
 public class OperationLogAspect {
 
+    private static final int MAX_LOG_LENGTH = 5_000;
+
     private final OperationLogRepository operationLogRepository;
     private final JwtUtil jwtUtil;
     private final ObjectMapper objectMapper;
@@ -29,102 +31,72 @@ public class OperationLogAspect {
     @Around("@annotation(com.example.taskmanagement.annotation.LogOperation)")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
-
-        // 获取request
-        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = attributes != null ? attributes.getRequest() : null;
-
-        // 创建日志对象
-        OperationLog log = new OperationLog();
-
-        // 获取注解信息
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();
-        LogOperation logOperation = method.getAnnotation(LogOperation.class);
-        if (logOperation != null) {
-            log.setOperation(logOperation.value());
-        }
+        boolean authenticationAction = "register".equals(signature.getName()) || "login".equals(signature.getName());
 
-        // 获取用户信息
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        HttpServletRequest request = attributes != null ? attributes.getRequest() : null;
+        OperationLog operationLog = new OperationLog();
+
+        LogOperation annotation = method.getAnnotation(LogOperation.class);
+        if (annotation != null) operationLog.setOperation(annotation.value());
+
         if (request != null) {
-            String authorization = request.getHeader("Authorization");
-            if (authorization != null && authorization.startsWith("Bearer ")) {
-                try {
-                    String token = authorization.substring(7);
-                    Long userId = jwtUtil.getUserIdFromToken(token);
-                    String username = jwtUtil.getUsernameFromToken(token);
-                    log.setUserId(userId);
-                    log.setUsername(username);
-                } catch (Exception e) {
-                    // Token解析失败，不记录用户信息
-                }
-            }
-
-            // 获取IP
-            log.setIp(getIpAddress(request));
+            setCurrentUser(operationLog, request.getHeader("Authorization"));
+            operationLog.setIp(getIpAddress(request));
         }
 
-        // 方法信息
-        String className = joinPoint.getTarget().getClass().getName();
-        String methodName = signature.getName();
-        log.setMethod(className + "." + methodName);
+        operationLog.setMethod(joinPoint.getTarget().getClass().getName() + "." + signature.getName());
+        operationLog.setParams(authenticationAction
+                ? "[authentication payload redacted]"
+                : serialize(joinPoint.getArgs(), "Request serialization failed"));
 
-        // 请求参数
-        Object[] args = joinPoint.getArgs();
         try {
-            String params = objectMapper.writeValueAsString(args);
-            if (params.length() > 5000) {
-                params = params.substring(0, 5000) + "...";
-            }
-            log.setParams(params);
-        } catch (Exception e) {
-            log.setParams("参数序列化失败");
-        }
-
-        // 执行方法
-        Object result = null;
-        try {
-            result = joinPoint.proceed();
-
-            // 记录返回结果
-            try {
-                String resultStr = objectMapper.writeValueAsString(result);
-                if (resultStr.length() > 5000) {
-                    resultStr = resultStr.substring(0, 5000) + "...";
-                }
-                log.setResult(resultStr);
-            } catch (Exception e) {
-                log.setResult("结果序列化失败");
-            }
-
+            Object result = joinPoint.proceed();
+            operationLog.setResult(authenticationAction
+                    ? "[authentication result redacted]"
+                    : serialize(result, "Result serialization failed"));
             return result;
-        } catch (Throwable e) {
-            log.setResult("异常：" + e.getMessage());
-            throw e;
+        } catch (Throwable throwable) {
+            operationLog.setResult("Exception: " + throwable.getClass().getSimpleName());
+            throw throwable;
         } finally {
-            // 执行时间
-            long executeTime = System.currentTimeMillis() - startTime;
-            log.setExecuteTime(executeTime);
-
-            // 保存日志
+            operationLog.setExecuteTime(System.currentTimeMillis() - startTime);
             try {
-                operationLogRepository.save(log);
-                System.out.println("📝 操作日志已记录：" + log.getOperation() + " - " + executeTime + "ms");
-            } catch (Exception e) {
-                System.err.println("❌ 操作日志保存失败：" + e.getMessage());
+                operationLogRepository.save(operationLog);
+            } catch (Exception exception) {
+                System.err.println("Operation log could not be saved: " + exception.getMessage());
             }
         }
     }
 
-    // 获取IP地址
+    private void setCurrentUser(OperationLog operationLog, String authorization) {
+        if (authorization == null || !authorization.startsWith("Bearer ")) return;
+        try {
+            String token = authorization.substring(7);
+            operationLog.setUserId(jwtUtil.getUserIdFromToken(token));
+            operationLog.setUsername(jwtUtil.getUsernameFromToken(token));
+        } catch (Exception ignored) {
+            // Invalid tokens are handled by the controller; logging remains anonymous.
+        }
+    }
+
+    private String serialize(Object value, String fallback) {
+        try {
+            String serialized = objectMapper.writeValueAsString(value);
+            return serialized.length() > MAX_LOG_LENGTH
+                    ? serialized.substring(0, MAX_LOG_LENGTH) + "..."
+                    : serialized;
+        } catch (Exception exception) {
+            return fallback;
+        }
+    }
+
     private String getIpAddress(HttpServletRequest request) {
         String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Real-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) ip = request.getHeader("X-Real-IP");
+        if (ip == null || ip.isBlank() || "unknown".equalsIgnoreCase(ip)) ip = request.getRemoteAddr();
         return ip;
     }
 }

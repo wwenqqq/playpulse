@@ -8,5 +8,5 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface LogOperation {
-    String value() default ""; // 操作描述
+    String value() default "";
 }

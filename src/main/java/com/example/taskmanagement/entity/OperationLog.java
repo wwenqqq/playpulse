@@ -22,22 +22,22 @@ public class OperationLog {
     private String username;
 
     @Column(name = "operation", length = 100)
-    private String operation; // 操作类型
+    private String operation;
 
     @Column(name = "method", length = 200)
-    private String method; // 方法名
+    private String method;
 
     @Column(name = "params", columnDefinition = "TEXT")
-    private String params; // 请求参数
+    private String params;
 
     @Column(name = "result", columnDefinition = "TEXT")
-    private String result; // 返回结果
+    private String result;
 
     @Column(name = "ip", length = 50)
-    private String ip; // IP地址
+    private String ip;
 
     @Column(name = "execute_time")
-    private Long executeTime; // 执行时间（毫秒）
+    private Long executeTime;
 
     @CreationTimestamp
     @Column(name = "created_at")
